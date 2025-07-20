@@ -2,9 +2,9 @@ name: Run Test Suite
 
 on:
   push:
-    branches: [ "root" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "root" ]
+    branches: [ "main" ]
   schedule:
     - cron: '0 0 * * 0'
 
