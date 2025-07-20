@@ -3,12 +3,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "MCMapFormat",
+    name: "MCMap",
     platforms: [.macOS(.v15), .iOS(.v18), .tvOS(.v18), .watchOS(.v11), .visionOS(.v2)],
     products: [
         .library(
-            name: "MCMapFormat",
-            targets: ["MCMapFormat"]
+            name: "MCMap",
+            targets: ["MCMap"]
         ),
     ],
     dependencies: [
@@ -16,12 +16,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MCMapFormat",
+            name: "MCMap",
             dependencies: ["VersionedCodable"]
         ),
         .testTarget(
-            name: "MCMapFormatTests",
-            dependencies: ["MCMapFormat"]
+            name: "MCMapTests",
+            dependencies: ["MCMap"]
         ),
     ]
 )
