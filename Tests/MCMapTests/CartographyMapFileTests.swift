@@ -8,7 +8,7 @@
 import SwiftUI
 import Testing
 
-@testable import MCMapFormat
+@testable import MCMap
 
 struct CartographyMapFileTests {
     @Test func initEmpty() async throws {

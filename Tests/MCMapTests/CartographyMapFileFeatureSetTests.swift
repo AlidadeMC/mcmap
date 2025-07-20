@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import MCMapFormat
+@testable import MCMap
 
 struct CartographyMapFileFeatureSetTests {
     @Test func featureSet_v1() async throws {
