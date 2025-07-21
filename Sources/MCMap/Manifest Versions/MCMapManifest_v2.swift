@@ -12,7 +12,7 @@ import VersionedCodable
 ///
 /// > Important: Unless specifying this version is strictly required, refer to the ``MCMapManifest`` type instead,
 /// > which points to the latest version.
-public struct MCMapManifest_v2: Codable, Hashable, Sendable {
+public struct MCMapManifest_v2: SendableCoded {
     private enum CodingKeys: String, CodingKey {
         case name, pins, recentLocations, manifestVersion
         case worldSettings = "world"

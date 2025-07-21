@@ -8,12 +8,12 @@
 import SwiftUI
 
 /// A representation of a player-placed map pin.
-public struct MCMapManifestPin: Codable, Hashable, Sendable {
+public struct MCMapManifestPin: SendableCoded {
     /// An enumeration representing the various colors a player can assign a pin to.
     ///
     /// When being encoded to and decoded from, they are represented as strings. For example, ``blue`` corresponds to
     /// `"blue"`.
-    public enum Color: String, Codable, Hashable, CaseIterable, Sendable {
+    public enum Color: String, SendableCoded, CaseIterable {
         case red, orange, yellow, green, blue, indigo, brown, gray, pink
     }
 

@@ -14,7 +14,7 @@ import VersionedCodable
 ///
 /// > Important: Unless specifying this version is strictly required, refer to the ``MCMapManifest`` type instead,
 /// > which points to the latest version.
-public struct MCMapManifest_v1: Codable, Hashable, Sendable {
+public struct MCMapManifest_v1: SendableCoded {
     /// The Minecraft world map package version.
     public var manifestVersion: Int? = 1
 

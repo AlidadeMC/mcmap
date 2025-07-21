@@ -11,7 +11,7 @@ import Foundation
 ///
 /// Integrations are used to connect to external services to provide additional information. Depending on the client
 /// implementation, this may include making network requests.
-public protocol MCMapIntegration: Codable, Sendable, Equatable, Hashable {
+public protocol MCMapIntegration: SendableCoded, Equatable {
     /// The key for the integration.
     ///
     /// This is used to register the file in the ``CartographyMapFile/Keys/integrations`` subdirectory.
