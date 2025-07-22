@@ -351,7 +351,7 @@ extension CartographyMapFile: FileDocument {
         var pinWrapperFiles = [String: FileWrapper]()
         if supportedFeatures.contains(.separateLibrary) {
             for pin in self.pins {
-                let filename = pin.name
+                let filename = pin.name + ".json"
                 let encoded = try JSONEncoder().encode(versioned: pin)
                 pinWrapperFiles[filename] = FileWrapper(regularFileWithContents: encoded)
             }
