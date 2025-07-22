@@ -36,6 +36,9 @@ extension CartographyMapFeatures: OptionSet {
     /// The file supports integrations with other services.
     public static let integrations = CartographyMapFeatures(rawValue: 1 << 5)
 
+    /// The file supports a separate player library instead of housing it in the manifest.
+    public static let separateLibrary = CartographyMapFeatures(rawValue: 1 << 6)
+
     /// The default set of features for the minimum version supported.
     public static let minimumDefault: CartographyMapFeatures = [.coreSearch, .corePinning]
 
@@ -50,6 +53,7 @@ extension CartographyMapFeatures: OptionSet {
             self.insert(.largeBiomes)
             self.insert(.tabCustomization)
             self.insert(.integrations)
+            self.insert(.separateLibrary)
         default:
             break
         }

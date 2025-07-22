@@ -69,6 +69,12 @@ public struct CartographyMapFile: Sendable, Equatable {
         /// The key that points to where information about integrations with other services are stored.
         public static let integrations = "Integrations"
 
+        /// The key that points to where the player's library is, which contains information such as pins and pin collections.
+        public static let library = "Library"
+
+        /// The key that points to player-created pins inside of the ``library``.
+        public static let pins = "Pins"
+
         @available(*, unavailable)
         init() {}
     }
@@ -108,11 +114,14 @@ public struct CartographyMapFile: Sendable, Equatable {
     /// The integrations provided with this file.
     public var integrations = Integrations()
 
+    /// The player-created pins in the library.
+    public var pins: [CartographyMapPin] = []
+
     /// A set containing all the available tags in the manifest's pins.
     public var tags: Set<String> {
         guard supportedFeatures.contains(.pinTagging) else { return [] }
         var tags = Set<String>()
-        for pin in manifest.pins {
+        for pin in pins {
             if let pinTags = pin.tags {
                 tags.formUnion(pinTags)
             }
@@ -122,11 +131,16 @@ public struct CartographyMapFile: Sendable, Equatable {
 
     /// Creates a map file from a world map and an image map.
     /// - Parameter manifest: The map structure to represent as the metadata.
+    /// - Parameter pins: The pins that will be included in the file.
     /// - Parameter images: The map containing the images available in this file.
-    public init(withManifest manifest: MCMapManifest, images: ImageMap = [:]) {
+    public init(withManifest manifest: MCMapManifest, pins: [CartographyMapPin] = [], images: ImageMap = [:]) {
         self.manifest = manifest
+        self.pins = pins
         self.images = images
         self.appState = AppState()
+
+        guard supportedFeatures.contains(.separateLibrary) else { return }
+        self.pins = manifest.pins.map(CartographyMapPin.init(migratingFrom:))
     }
 
     /// Creates a file by decoding a data object.
@@ -139,6 +153,9 @@ public struct CartographyMapFile: Sendable, Equatable {
         self.images = [:]
         self.appState = AppState()
         self.integrations = Integrations()
+
+        guard supportedFeatures.contains(.separateLibrary) else { return }
+        self.pins = self.manifest.pins.map(CartographyMapPin.init(migratingFrom:))
     }
 
     /// Prepares the map metadata for an export or save operation.
@@ -152,8 +169,20 @@ public struct CartographyMapFile: Sendable, Equatable {
         return try encoder.encode(versioned: transformedMap)
     }
 
+    public mutating func removePinFromLibrary(at index: [CartographyMapPin].Index) {
+        guard pins.indices.contains(index) else { return }
+        let pinToDelete = pins[index]
+        if let images = pinToDelete.images {
+            for image in images {
+                self.images[image] = nil
+            }
+        }
+        pins.remove(at: index)
+    }
+
     /// Removes a player-created pin at a given index, deleting associated images with it.
     /// - Parameter index: The index of the pin to remove from the library.
+    @available(*, deprecated, renamed: "removePinFromLibrary(at:)")
     public mutating func removePin(at index: [MCMapManifestPin].Index) {
         guard manifest.pins.indices.contains(index) else { return }
         let pin = manifest.pins[index]
@@ -170,9 +199,26 @@ public struct CartographyMapFile: Sendable, Equatable {
     /// This is generally recommended for built-in SwiftUI facilities or mass pin deletion operations.
     /// - Parameter offsets: The offsets to delete pins from.
     public mutating func removePins(at offsets: IndexSet) {
+        guard supportedFeatures.contains(.separateLibrary) else {
+            removeClassicPins(at: offsets)
+            return
+        }
         var imagesToDelete = [String]()
         for offset in offsets {
-            let pin = manifest.pins[offset]
+            let pin = pins[offset]
+            guard let images = pin.images else { continue }
+            imagesToDelete.append(contentsOf: images)
+        }
+        for image in imagesToDelete {
+            self.images[image] = nil
+        }
+        pins.remove(atOffsets: offsets)
+    }
+
+    mutating func removeClassicPins(at offsets: IndexSet) {
+        var imagesToDelete = [String]()
+        for offset in offsets {
+            let pin =  manifest.pins[offset]
             guard let images = pin.images else { continue }
             imagesToDelete.append(contentsOf: images)
         }
@@ -211,6 +257,24 @@ extension CartographyMapFile: FileDocument {
         }
         let decoder = JSONDecoder()
         self.manifest = try decoder.decode(versioned: MCMapManifest.self, from: metadataContents)
+        self.pins = []
+
+        // Migrate pins out of the manifest, and into their own block.
+        if supportedFeatures.contains(.separateLibrary) {
+            migratePinDataIfNecessary()
+            if let library = fileWrappers?[Keys.library], library.isDirectory {
+                if let pins = library.fileWrappers?[Keys.pins], pins.isDirectory, let pinFiles = pins.fileWrappers {
+                    let newPins = try pinFiles.reduce(into: [CartographyMapPin]()) { (accum, kvPair) in
+                        let (_, wrapper) = kvPair
+                        guard let data = wrapper.regularFileContents else { return }
+                        let decoded = try JSONDecoder().decode(versioned: CartographyMapPin.self, from: data)
+                        accum.append(decoded)
+                    }
+                    self.pins.append(contentsOf: newPins)
+                }
+            }
+        }
+        
         if let imagesDir = fileWrappers?[Keys.images], imagesDir.isDirectory, let wrappers = imagesDir.fileWrappers {
             self.images = wrappers.reduce(into: [:]) { (imageMap, kvPair) in
                 let (key, wrapper) = kvPair
@@ -234,6 +298,13 @@ extension CartographyMapFile: FileDocument {
                 integrations.bluemap = try decoder.decode(MCMapBluemapIntegration.self, from: bluemap)
             }
         }
+    }
+
+    @available(*, deprecated, message: "This will be removed in a future iteration.")
+    mutating func migratePinDataIfNecessary() {
+        if manifest.pins.isEmpty { return }
+        self.pins = manifest.pins.map(CartographyMapPin.init(migratingFrom:))
+        manifest.pins = []
     }
 
     /// Creates a file wrapper from a write configuration.
@@ -277,6 +348,15 @@ extension CartographyMapFile: FileDocument {
                 regularFileWithContents: bluemap)
         }
 
+        var pinWrapperFiles = [String: FileWrapper]()
+        if supportedFeatures.contains(.separateLibrary) {
+            for pin in self.pins {
+                let filename = pin.name
+                let encoded = try JSONEncoder().encode(versioned: pin)
+                pinWrapperFiles[filename] = FileWrapper(regularFileWithContents: encoded)
+            }
+        }
+
         if supportedFeatures != .minimumDefault {
             let appStateWrapper = FileWrapper(directoryWithFileWrappers: appStateWrapperFiles)
             appStateWrapper.preferredFilename = Keys.appState
@@ -285,6 +365,13 @@ extension CartographyMapFile: FileDocument {
             let integrationsWrapper = FileWrapper(directoryWithFileWrappers: integrationsWrapperFiles)
             integrationsWrapper.preferredFilename = Keys.integrations
             fileWrapper.addFileWrapper(integrationsWrapper)
+
+            let pinWrappers = FileWrapper(directoryWithFileWrappers: pinWrapperFiles)
+            let library = FileWrapper(directoryWithFileWrappers: [
+                Keys.pins: pinWrappers
+            ])
+            library.preferredFilename = Keys.library
+            fileWrapper.addFileWrapper(library)
         }
 
         return fileWrapper

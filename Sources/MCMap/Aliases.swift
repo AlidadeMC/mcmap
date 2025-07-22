@@ -9,4 +9,4 @@
 ///
 /// To ensure compatibility with Swift concurrency, certain types need to guarantee sendability. This typealias can be
 /// used to clean up the implementation site by storing all the codable and sendable protocols into a single type.
-public typealias SendableCoded = Sendable & Codable & Hashable
+typealias SendableCoded = Sendable & Codable & Hashable

@@ -27,7 +27,7 @@ struct CartographyMapFileTests {
         #expect(file.manifest.name == "Pack.mcmeta")
         #expect(file.manifest.worldSettings.version == "1.2")
         #expect(file.manifest.worldSettings.seed == 3_257_840_388_504_953_787)
-        #expect(file.manifest.pins.count == 2)
+        #expect(file.pins.count == 2)
         #expect(file.manifest.recentLocations?.count == 1)
     }
 
@@ -36,12 +36,19 @@ struct CartographyMapFileTests {
             Issue.record("Failed to convert to a Data object.")
             return
         }
+        guard let mapStripped = Self.packMcmetaFile_V2_StrippedPins.data(using: .utf8) else {
+            Issue.record("Failed to convert to a Data object.")
+            return
+        }
+
         var file = try CartographyMapFile(decoding: map)
         file.images = ["foo.png": Data()]
         let wrapper = try file.wrapper()
 
+        let manifestWithStrippedPins = try JSONDecoder().decode(versioned: MCMapManifest.self, from: mapStripped)
+
         let newFile = try CartographyMapFile(fileWrappers: wrapper.fileWrappers)
-        #expect(newFile.manifest == file.manifest)
+        #expect(newFile.manifest == manifestWithStrippedPins)
         #expect(newFile.images == ["foo.png": Data()])
     }
 
@@ -83,6 +90,7 @@ struct CartographyMapFileTests {
         #expect(wrapper.fileWrappers?["Info.json"] != nil)
         #expect(wrapper.fileWrappers?["Images"] != nil)
         #expect(wrapper.fileWrappers?["AppState"] != nil)
+        #expect(wrapper.fileWrappers?["Library"] != nil)
 
         let infoWrapper = wrapper.fileWrappers?["Info.json"]!
         #expect(infoWrapper?.isRegularFile == true)
@@ -99,17 +107,25 @@ struct CartographyMapFileTests {
         let integrations = wrapper.fileWrappers?["Integrations"]!
         #expect(integrations?.isDirectory == true)
         #expect(integrations?.fileWrappers?["Bluemap.json"] != nil)
+
+        let library = wrapper.fileWrappers?["Library"]!
+        #expect(library?.isDirectory == true)
+        #expect(library?.fileWrappers?["Pins"] != nil)
+
+        let pins = library?.fileWrappers?["Pins"]!
+        #expect(pins?.isDirectory == true)
+        #expect(pins?.fileWrappers?.count == 2)
     }
 
     @Test func pinDeletesAtIndex() async throws {
         var file = CartographyMapFile(withManifest: .sampleFile, images: [
             "foo.png": Data()
         ])
-        file.manifest.pins[0].images = ["foo.png"]
-        file.removePin(at: file.manifest.pins.startIndex)
+        file.pins[0].images = ["foo.png"]
+        file.removePinFromLibrary(at: file.pins.startIndex)
         #expect(file.images["foo.png"] == nil)
         #expect(file.images.isEmpty)
-        #expect(file.manifest.pins.isEmpty)
+        #expect(file.pins.isEmpty)
     }
 
     @Test func pinDeletesAtOffsets() async throws {
@@ -117,13 +133,13 @@ struct CartographyMapFileTests {
             "foo.png": Data(),
             "bar.png": Data()
         ])
-        file.manifest.pins[0].images = ["foo.png"]
-        file.manifest.pins.append(MCMapManifestPin(position: .init(x: 2, y: 2), name: "Don't delete me"))
-        file.manifest.pins.append(MCMapManifestPin(position: .zero, name: "Alt Point", images: ["bar.png"]))
+        file.pins[0].images = ["foo.png"]
+        file.pins.append(CartographyMapPin(named: "Don't delete me", at: CGPoint(x: 2, y: 2)))
+        file.pins.append(CartographyMapPin(named: "Alt Point", at: .zero, images: ["bar.png"]))
         file.removePins(at: [0, 2])
         #expect(file.images.isEmpty)
-        #expect(file.manifest.pins.count == 1)
-        #expect(file.manifest.pins[0].name == "Don't delete me")
+        #expect(file.pins.count == 1)
+        #expect(file.pins[0].name == "Don't delete me")
     }
 }
 
@@ -183,6 +199,26 @@ extension CartographyMapFileTests {
               ]
             }
           ],
+          "recentLocations" : [
+            [
+              116,
+              -31
+            ]
+          ],
+          "world" : {
+            "largeBiomes" : false,
+            "seed" : 3257840388504953787,
+            "version" : "1.2"
+          }
+        }
+        """
+
+    static let packMcmetaFile_V2_StrippedPins =
+        """
+        {
+          "manifestVersion" : 2,
+          "name" : "Pack.mcmeta",
+          "pins" : [],
           "recentLocations" : [
             [
               116,
