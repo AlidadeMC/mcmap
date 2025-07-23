@@ -50,7 +50,7 @@ public enum CartographyIcon: RawRepresentable, SendableCoded {
             self = .town
         case "book":
             self = .book
-        case rawValue where rawValue.unicodeScalars.allSatisfy(\.properties.isEmoji):
+        case rawValue where rawValue.isEmoji:
             self = .emoji(rawValue)
         default:
             return nil
@@ -66,6 +66,14 @@ public enum CartographyIcon: RawRepresentable, SendableCoded {
         case .town: "town"
         case .book: "book"
         case .emoji(let emojiString): emojiString
+        }
+    }
+}
+
+extension String {
+    var isEmoji: Bool {
+        unicodeScalars.allSatisfy { scalar in
+            scalar.properties.isEmoji || scalar.properties.isEmojiModifier || scalar.properties.isEmojiPresentation
         }
     }
 }
