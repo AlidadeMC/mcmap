@@ -73,7 +73,10 @@ public enum CartographyIcon: RawRepresentable, SendableCoded {
 extension String {
     var isEmoji: Bool {
         unicodeScalars.allSatisfy { scalar in
-            scalar.properties.isEmoji || scalar.properties.isEmojiModifier || scalar.properties.isEmojiPresentation
+            scalar.properties.isEmoji
+                || scalar.properties.isEmojiModifier
+                || scalar.properties.isEmojiPresentation
+                || scalar.properties.isEmojiModifierBase
         }
     }
 }
