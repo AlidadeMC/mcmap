@@ -30,39 +30,37 @@ public enum CartographyIconContext {
     case pin
 }
 
-public extension CartographyIcon {
+extension CartographyIcon {
     /// Resolve the semantic icon into an SF Symbol image from the given context.
     /// - Parameter context: The context that describes the semantic usage of the icon.
-    func resolveSFSymbol(in context: CartographyIconContext) -> String {
-        let defaultIcon = switch context {
-        case .pin:
-            "mappin"
-        }
+    public func resolveSFSymbol(in context: CartographyIconContext) -> String {
+        let defaultIcon =
+            switch context {
+            case .pin:
+                "mappin"
+            }
 
-        switch self {
-        case .default:
-            return defaultIcon
-        case .sparklyBubbles:
-            return "bubbles.and.sparkles"
-        case .town:
-            return "building.2"
-        case .home:
-            return "house"
-        case .walking:
-            return "figure.walk"
-        case .lodge:
-            return "house.lodge"
-        case .signpost:
-            return "signpost.right"
-        case .forkAndKnife:
-            return "fork.knife"
-        default:
-            return rawValue.dotCase
+        return switch self {
+        case .default: defaultIcon
+        case .sparklyBubbles: "bubbles.and.sparkles"
+        case .town: "building.2"
+        case .home: "house"
+        case .walking: "figure.walk"
+        case .lodge: "house.lodge"
+        case .signpost: "signpost.right"
+        case .forkAndKnife: "fork.knife"
+        case .bed: "bed.double"
+        case .teddyBear: "teddybear"
+        case .flashlight: "flashlight.on.fill"
+        case .puzzlePiece: "puzzlepiece"
+        case .theaterMasks: "theatermasks"
+        case .coffee: "cup.and.heat.waves"
+        default: rawValue.dotCase
         }
     }
 }
 
-public extension Image {
+extension Image {
     /// Create an image from an icon within a provided context.
     ///
     /// Calling this initializer will generate the appropriate SF Symbol that can be used in labels, icons, and other
@@ -70,12 +68,12 @@ public extension Image {
     /// the context.
     /// - Parameter cartographyIcon: The icon to create an image of.
     /// - Parameter context: The context that describes the semantic usage of the icon.
-    init(cartographyIcon: CartographyIcon, in context: CartographyIconContext) {
+    public init(cartographyIcon: CartographyIcon, in context: CartographyIconContext) {
         self.init(systemName: cartographyIcon.resolveSFSymbol(in: context))
     }
 }
 
-public extension Label where Title == Text, Icon == Image {
+extension Label where Title == Text, Icon == Image {
     /// Create a label using a title and an icon within a provided context.
     ///
     /// Calling this initializer will generate the appropriate SF Symbol that can be used in labels, icons, and other
@@ -85,7 +83,7 @@ public extension Label where Title == Text, Icon == Image {
     /// - Parameter title: The label's title.
     /// - Parameter cartographyIcon: The icon to display in the label.
     /// - Parameter context: The context that describes the semantic usage of the icon.
-    init(_ title: LocalizedStringKey, cartographyIcon: CartographyIcon, in context: CartographyIconContext) {
+    public init(_ title: LocalizedStringKey, cartographyIcon: CartographyIcon, in context: CartographyIconContext) {
         self.init(title, systemImage: cartographyIcon.resolveSFSymbol(in: context))
     }
 }

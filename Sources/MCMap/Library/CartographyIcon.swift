@@ -25,7 +25,7 @@ public enum CartographyIcon: String, SendableCoded {
 
     // Objects
     case duffleBag, book, medal, trophy, beachUmbrella, flag, flashlight, camera, bag, cart, dice, wrench, briefcase,
-        bed, soda, chair, fireplace, washer, syringe, pill, bandage, teddyBear, carrot, forkAndKnife
+        bed, coffee, chair, fireplace, washer, syringe, pill, bandage, teddyBear, carrot, forkAndKnife
 
     // Shapes
     case circle, square, rectangle, capsule, oval, triangle, diamond, octagon, hexagon, pentagon, seal
