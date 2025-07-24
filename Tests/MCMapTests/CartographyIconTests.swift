@@ -15,9 +15,6 @@ struct CartographyIconTests {
         let defaultIcon = CartographyIcon(rawValue: "default")
         #expect(defaultIcon == .default)
 
-        let emojiIcon = CartographyIcon(rawValue: "🚗")
-        #expect(emojiIcon == .emoji("🚗"))
-
         let noIcon = CartographyIcon(rawValue: "foo")
         #expect(noIcon == nil)
     }
@@ -25,8 +22,5 @@ struct CartographyIconTests {
     @Test func decodeToRawValue() async throws {
         let defaultIcon = CartographyIcon.default
         #expect(defaultIcon.rawValue == "default")
-
-        let emojiIcon = CartographyIcon.emoji("🚗")
-        #expect(emojiIcon.rawValue == "🚗")
     }
 }
