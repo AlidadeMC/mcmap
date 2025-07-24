@@ -30,7 +30,6 @@ public struct MCMapManifest_v2: SendableCoded {
     public var worldSettings: MCMapManifestWorldSettings
 
     /// A list of player-created pins for notable areas in the world.
-    @available(*, deprecated, message: "Pins should be accessed from CartographyMapFile.pins.")
     public var pins: [MCMapManifestPin]
 
     /// A stack containing the most recent locations visited.

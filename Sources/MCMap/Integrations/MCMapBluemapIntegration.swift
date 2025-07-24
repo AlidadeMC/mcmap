@@ -10,7 +10,7 @@ import Foundation
 /// A structure that defines integrations with the Bluemap service.
 ///
 /// Bluemap is a mapping plugin for Minecraft servers that provide an in-depth map with players, death markers, and general POIs.
-public struct MCMapBluemapIntegration: MCMapIntegration {
+public struct MCMapBluemapIntegration: CartographyMapIntegration {
     /// The key used to pull the integration from the package.
     public static let integrationKey = "Bluemap.json"
 
