@@ -23,4 +23,12 @@ struct CartographyIconTests {
         let defaultIcon = CartographyIcon.default
         #expect(defaultIcon.rawValue == "default")
     }
+
+    @Test func iconResolution() async throws {
+        #expect(CartographyIcon.beachUmbrella.resolveSFSymbol(in: .pin) == "beach.umbrella")
+        #expect(CartographyIcon.forkAndKnife.resolveSFSymbol(in: .pin) == "fork.knife")
+
+        let semanticDefault = CartographyIcon.default
+        #expect(semanticDefault.resolveSFSymbol(in: .pin) == "mappin")
+    }
 }

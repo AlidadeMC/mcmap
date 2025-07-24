@@ -13,20 +13,25 @@ public enum CartographyIcon: String, SendableCoded {
     ///
     /// This icon might be represented differently depending on the context it's used in. For example, this might
     /// appear as a map pin when used in ``CartographyMapPin``, and as a folder or grid in a group.
+    ///
+    /// - SeeAlso: For a list of all the potential use cases, refer to the ``CartographyIconContext``.
     case `default`
 
-    /// An icon that displays a house or home.
-    case home
+    // Buildings
+    case home, building, town, mecca, tent, lodge
 
-    /// An icon that displays a single building.
-    case building
+    // Transportation
+    case bus, tram, walking, signpost
 
-    /// An icon that displays a book.
-    case book
+    // Objects
+    case duffleBag, book, medal, trophy, beachUmbrella, flag, flashlight, camera, bag, cart, dice, wrench, briefcase,
+        bed, soda, chair, fireplace, washer, syringe, pill, bandage, teddyBear, carrot, forkAndKnife
 
-    /// An icon that displays a town or multiple buildings together.
-    case town
-
-    /// An icon that displays bubbles surrounded by sparkles.
-    case sparklyBubbles
+    // Shapes
+    case circle, square, rectangle, capsule, oval, triangle, diamond, octagon, hexagon, pentagon, seal
+    
+    // Misc.
+    case sparklyBubbles, theaterMasks, puzzlePiece, film, cube
 }
+
+extension CartographyIcon: CaseIterable {}

@@ -15,8 +15,6 @@ extension UTType {
 }
 
 /// A structure representing the Minecraft map file format (`.mcmap`).
-///
-/// This structure is used to open, edit, write, and save files through SwiftUI.
 public struct CartographyMapFile: Sendable, Equatable {
     /// A typealias representing the manifest for the current file.
     public typealias Manifest = MCMapManifest
@@ -90,8 +88,7 @@ public struct CartographyMapFile: Sendable, Equatable {
     /// The manifest file that describes the structure and behavior of the map file, such as player created pins,
     /// version, and seed.
     ///
-    /// In previous versions of the codebase, this was called the `map`. This property should be versioned and
-    /// documented in <doc:FileFormat>.
+    /// In previous versions of the codebase, this was called the `map`. This property should be versioned.
     ///
     /// > Note: When removing pins from the map, call ``removePin(at:)`` instead of directly removing the pin, as the
     /// > former ensures that any associated photos are removed.
