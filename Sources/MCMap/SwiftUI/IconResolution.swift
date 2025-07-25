@@ -55,6 +55,7 @@ extension CartographyIcon {
         case .puzzlePiece: "puzzlepiece"
         case .theaterMasks: "theatermasks"
         case .coffee: "cup.and.heat.waves"
+        case .mountains: "mountain.2"
         default: rawValue.dotCase
         }
     }

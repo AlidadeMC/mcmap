@@ -21,11 +21,19 @@ public enum CartographyIcon: String, SendableCoded {
     case home, building, town, mecca, tent, lodge
 
     // Transportation
-    case bus, tram, walking, signpost
+    case airplane, bus, car, ferry, sailboat, signpost, tram, walking
+
+    // Automotive
+    case tire, horn
 
     // Objects
     case duffleBag, book, medal, trophy, beachUmbrella, flag, flashlight, camera, bag, cart, dice, wrench, briefcase,
-        bed, coffee, chair, fireplace, washer, syringe, pill, bandage, teddyBear, carrot, forkAndKnife
+        bed, coffee, chair, fireplace, washer, syringe, pill, bandage, teddyBear, carrot, forkAndKnife, shield,
+        gear, gyroscope, pianokeys, hammer, scroll, fan, balloon, cpu, memorychip, helmet, stroller, crown, stopwatch,
+        clock
+
+    // Nature
+    case sunrise, sunset, moon, wind, snowflake, rainbow, bolt, mountains, allergens, laurel
 
     // Shapes
     case circle, square, rectangle, capsule, oval, triangle, diamond, octagon, hexagon, pentagon, seal
