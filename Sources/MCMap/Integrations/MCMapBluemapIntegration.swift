@@ -69,6 +69,9 @@ public struct MCMapBluemapIntegration: CartographyMapIntegration {
     /// How often the markers should be refreshed.
     public var refreshRate: TimeInterval = 10
 
+    /// Whether to allow streaming realtime data independent of the ``refreshRate``.
+    public var realtime: Bool = false
+
     /// The markers that should be displayed on the map.
     public var display: DisplayProperties = DisplayProperties()
 
@@ -80,6 +83,7 @@ public struct MCMapBluemapIntegration: CartographyMapIntegration {
         baseURL: String,
         enabled: Bool = false,
         refreshRate: TimeInterval = 10,
+        realtime: Bool = false,
         display: DisplayProperties = DisplayProperties(),
         mapping: WorldMapping = WorldMapping()
     ) {
@@ -88,5 +92,6 @@ public struct MCMapBluemapIntegration: CartographyMapIntegration {
         self.refreshRate = refreshRate
         self.display = display
         self.mapping = mapping
+        self.realtime = realtime
     }
 }
