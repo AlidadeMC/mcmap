@@ -75,6 +75,11 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
     /// A set of tags associated with this pin.
     public var tags: Set<String>? = []
 
+    /// A set of alternative IDs that correspond to this pin.
+    ///
+    /// If an integration recognizes this pin by a different ID, it will be visible here.
+    public var alternateIDs: Set<String>?
+
     public init(
         named name: String,
         at position: CGPoint,
@@ -82,7 +87,8 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
         icon: Icon? = .default,
         description: String? = "",
         images: Set<String>? = [],
-        tags: Set<String>? = []
+        tags: Set<String>? = [],
+        alternateIDs: Set<String>? = nil
     ) {
         self.name = name
         self.position = position
@@ -93,6 +99,7 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
         self.description = description ?? ""
         self.images = images
         self.tags = tags
+        self.alternateIDs = alternateIDs
     }
 }
 
