@@ -14,6 +14,18 @@ import VersionedCodable
 public struct CartographyMapPin: SendableCoded, Identifiable {
     public typealias Icon = CartographyIcon
 
+    /// An enumeration of the dimensions a pin can be located in.
+    public enum Dimension: String, SendableCoded {
+        /// The Overworld dimension.
+        case overworld
+
+        /// The Nether dimension.
+        case nether
+
+        /// The End dimension.
+        case end
+    }
+
     /// An enumeration of the color variants available for a pin.
     ///
     /// These colors generally map to corresponding system colors based on the implementation.
@@ -63,6 +75,9 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
     /// The pin's accent color.
     public var color: Color? = .blue
 
+    /// The dimension that the pin is applicable to.
+    public var dimension: Dimension = .overworld
+
     /// The pin's icon.
     public var icon: Icon? = .default
 
@@ -83,6 +98,7 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
     public init(
         named name: String,
         at position: CGPoint,
+        dimension: Dimension = .overworld,
         color: Color? = .blue,
         icon: Icon? = .default,
         description: String? = "",
@@ -92,6 +108,7 @@ public struct CartographyMapPin: SendableCoded, Identifiable {
     ) {
         self.name = name
         self.position = position
+        self.dimension = dimension
         self.id = UUID()
 
         self.color = color
@@ -122,5 +139,6 @@ extension CartographyMapPin: VersionedCodable {
 
         self.id = UUID()
         self.icon = .default
+        self.dimension = .overworld
     }
 }
