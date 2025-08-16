@@ -35,6 +35,9 @@ public enum CartographyIcon: String, SendableCoded {
     // Nature
     case sunrise, sunset, moon, wind, snowflake, rainbow, bolt, mountains, allergens, laurel
 
+    // Animals
+    case hare, tortoise, dog, cat, lizard, bird, ant, ladybug
+
     // Shapes
     case circle, square, rectangle, capsule, oval, triangle, diamond, octagon, hexagon, pentagon, seal
     

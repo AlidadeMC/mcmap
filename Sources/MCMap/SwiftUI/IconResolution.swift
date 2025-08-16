@@ -56,6 +56,7 @@ extension CartographyIcon {
         case .theaterMasks: "theatermasks"
         case .coffee: "cup.and.heat.waves"
         case .mountains: "mountain.2"
+        case .laurel: "laurel.leading.laurel.trailing"
         default: rawValue.dotCase
         }
     }
