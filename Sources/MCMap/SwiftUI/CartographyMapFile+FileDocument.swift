@@ -51,6 +51,11 @@ extension CartographyMapFile: FileDocument {
                 }
             }
         }
+
+        // Sort entries alphabetically.
+        self.pins.sort { lhs, rhs in
+            lhs.name.lowercased() < rhs.name.lowercased()
+        }
         
         if let imagesDir = fileWrappers?[Keys.images], imagesDir.isDirectory, let wrappers = imagesDir.fileWrappers {
             self.images = wrappers.reduce(into: [:]) { (imageMap, kvPair) in
