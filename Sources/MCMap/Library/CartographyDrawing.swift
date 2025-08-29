@@ -48,6 +48,12 @@ public struct CartographyDrawing: SendableCoded, Identifiable {
 
         /// The map region that encompasses the drawing.
         public var mapRect: MapRect
+
+        public init(coordinate: CGPoint, drawing: PKDrawing, mapRect: MapRect) {
+            self.coordinate = coordinate
+            self.drawing = drawing
+            self.mapRect = mapRect
+        }
     }
 
     /// A unique identifier for the drawing overlay.
@@ -55,6 +61,11 @@ public struct CartographyDrawing: SendableCoded, Identifiable {
 
     /// The drawing overlay contents to send to a corresponding map.
     public var data: DrawingOverlay
+
+    public init(id: UUID, data: DrawingOverlay) {
+        self.id = id
+        self.data = data
+    }
 }
 
 extension CartographyDrawing: VersionedCodable {
