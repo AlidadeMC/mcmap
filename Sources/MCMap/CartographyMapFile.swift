@@ -73,6 +73,9 @@ public struct CartographyMapFile: Sendable, Equatable {
         /// The key that points to player-created pins inside of the ``library``.
         public static let pins = "Pins"
 
+        /// The key that points to the player-created drawings inside of the ``library``.
+        public static let drawings = "Drawings"
+
         @available(*, unavailable)
         init() {}
     }
@@ -114,6 +117,9 @@ public struct CartographyMapFile: Sendable, Equatable {
     /// The player-created pins in the library.
     public var pins: [CartographyMapPin] = []
 
+    /// The player-created drawings in the library.
+    public var drawings: [CartographyDrawing] = []
+
     /// A set containing all the available tags in the manifest's pins.
     public var tags: Set<String> {
         guard supportedFeatures.contains(.pinTagging) else { return [] }
@@ -150,6 +156,7 @@ public struct CartographyMapFile: Sendable, Equatable {
         self.images = [:]
         self.appState = AppState()
         self.integrations = Integrations()
+        self.drawings = []
 
         guard supportedFeatures.contains(.separateLibrary) else { return }
         self.pins = self.manifest.pins.map(CartographyMapPin.init(migratingFrom:))
@@ -255,5 +262,7 @@ extension CartographyMapFile: Hashable {
         }
         hasher.combine(integrations)
         hasher.combine(appState)
+        hasher.combine(pins)
+        hasher.combine(drawings)
     }
 }

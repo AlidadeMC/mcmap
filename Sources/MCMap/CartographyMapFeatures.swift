@@ -58,6 +58,11 @@ extension CartographyMapFeatures: OptionSet {
     /// This feature is available from v2+ of the file format.
     public static let pinIcons = CartographyMapFeatures(rawValue: 1 << 7)
 
+    /// The file supports custom drawings that appear on the map.
+    ///
+    /// This feature is available from v2+ of the file format.
+    public static let drawings = CartographyMapFeatures(rawValue: 1 << 8)
+
     /// The default set of features for the minimum version supported.
     public static let minimumDefault: CartographyMapFeatures = [.coreSearch, .corePinning]
 
@@ -74,6 +79,7 @@ extension CartographyMapFeatures: OptionSet {
             self.insert(.integrations)
             self.insert(.separateLibrary)
             self.insert(.pinIcons)
+            self.insert(.drawings)
         default:
             break
         }

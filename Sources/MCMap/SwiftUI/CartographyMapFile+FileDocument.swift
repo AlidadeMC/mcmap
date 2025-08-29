@@ -40,15 +40,7 @@ extension CartographyMapFile: FileDocument {
         if supportedFeatures.contains(.separateLibrary) {
             migratePinDataIfNecessary()
             if let library = fileWrappers?[Keys.library], library.isDirectory {
-                if let pins = library.fileWrappers?[Keys.pins], pins.isDirectory, let pinFiles = pins.fileWrappers {
-                    let newPins = try pinFiles.reduce(into: [CartographyMapPin]()) { (accum, kvPair) in
-                        let (_, wrapper) = kvPair
-                        guard let data = wrapper.regularFileContents else { return }
-                        let decoded = try JSONDecoder().decode(versioned: CartographyMapPin.self, from: data)
-                        accum.append(decoded)
-                    }
-                    self.pins.append(contentsOf: newPins)
-                }
+                try loadLibrary(wrapper: library)
             }
         }
 
@@ -56,7 +48,7 @@ extension CartographyMapFile: FileDocument {
         self.pins.sort { lhs, rhs in
             lhs.name.lowercased() < rhs.name.lowercased()
         }
-        
+
         if let imagesDir = fileWrappers?[Keys.images], imagesDir.isDirectory, let wrappers = imagesDir.fileWrappers {
             self.images = wrappers.reduce(into: [:]) { (imageMap, kvPair) in
                 let (key, wrapper) = kvPair
@@ -86,6 +78,31 @@ extension CartographyMapFile: FileDocument {
         if manifest.pins.isEmpty { return }
         self.pins = manifest.pins.map(CartographyMapPin.init(migratingFrom:))
         manifest.pins = []
+    }
+
+    mutating func loadLibrary(wrapper library: FileWrapper) throws {
+        if let pins = library.fileWrappers?[Keys.pins], pins.isDirectory, let pinFiles = pins.fileWrappers {
+            let newPins = try pinFiles.reduce(into: [CartographyMapPin]()) { (accum, kvPair) in
+                let (_, wrapper) = kvPair
+                guard let data = wrapper.regularFileContents else { return }
+                let decoded = try JSONDecoder().decode(versioned: CartographyMapPin.self, from: data)
+                accum.append(decoded)
+            }
+            self.pins.append(contentsOf: newPins)
+        }
+
+        guard supportedFeatures.contains(.drawings) else { return }
+        if let drawings = library.fileWrappers?[Keys.drawings], drawings.isDirectory,
+            let drawingFiles = drawings.fileWrappers
+        {
+            let drawings = try drawingFiles.reduce(into: [CartographyDrawing]()) { partialResult, kvPair in
+                let (_, wrapper) = kvPair
+                guard let data = wrapper.regularFileContents else { return }
+                let decoded = try JSONDecoder().decode(versioned: CartographyDrawing.self, from: data)
+                partialResult.append(decoded)
+            }
+            self.drawings.append(contentsOf: drawings)
+        }
     }
 
     /// Creates a file wrapper from a write configuration.
@@ -126,7 +143,8 @@ extension CartographyMapFile: FileDocument {
         if supportedFeatures.contains(.integrations) {
             let bluemap = try Self.jsonEncoder().encode(integrations.bluemap)
             integrationsWrapperFiles[MCMapBluemapIntegration.integrationKey] = FileWrapper(
-                regularFileWithContents: bluemap)
+                regularFileWithContents: bluemap
+            )
         }
 
         var pinWrapperFiles = [String: FileWrapper]()
@@ -135,6 +153,15 @@ extension CartographyMapFile: FileDocument {
                 let filename = pin.name + ".json"
                 let encoded = try Self.jsonEncoder().encode(versioned: pin)
                 pinWrapperFiles[filename] = FileWrapper(regularFileWithContents: encoded)
+            }
+        }
+
+        var drawingFiles = [String: FileWrapper]()
+        if !supportedFeatures.intersection([.separateLibrary, .drawings]).isEmpty {
+            for drawing in self.drawings {
+                let filename = drawing.id.uuidString + ".json"
+                let encoded = try Self.jsonEncoder().encode(versioned: drawing)
+                drawingFiles[filename] = FileWrapper(regularFileWithContents: encoded)
             }
         }
 
@@ -148,8 +175,11 @@ extension CartographyMapFile: FileDocument {
             fileWrapper.addFileWrapper(integrationsWrapper)
 
             let pinWrappers = FileWrapper(directoryWithFileWrappers: pinWrapperFiles)
+            let drawingWrappers = FileWrapper(directoryWithFileWrappers: drawingFiles)
+
             let library = FileWrapper(directoryWithFileWrappers: [
-                Keys.pins: pinWrappers
+                Keys.pins: pinWrappers,
+                Keys.drawings: drawingWrappers
             ])
             library.preferredFilename = Keys.library
             fileWrapper.addFileWrapper(library)

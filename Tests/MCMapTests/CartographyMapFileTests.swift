@@ -5,6 +5,7 @@
 //  Created by Marquis Kurt on 31-01-2025.
 //
 
+import PencilKit
 import SwiftUI
 import Testing
 
@@ -43,6 +44,20 @@ struct CartographyMapFileTests {
 
         var file = try CartographyMapFile(decoding: map)
         file.images = ["foo.png": Data()]
+        file.drawings = [
+            CartographyDrawing(
+                data: CartographyDrawing.DrawingOverlay(
+                    coordinate: CGPoint(x: 37, y: -122),
+                    drawing: PKDrawing(),
+                    mapRect: CartographyDrawing.DrawingOverlay.MapRect(
+                        x: 37,
+                        z: -122,
+                        width: 5,
+                        height: 5
+                    )
+                )
+            )
+        ]
         let wrapper = try file.wrapper()
 
         let manifestWithStrippedPins = try JSONDecoder().decode(versioned: MCMapManifest.self, from: mapStripped)
@@ -50,6 +65,7 @@ struct CartographyMapFileTests {
         let newFile = try CartographyMapFile(fileWrappers: wrapper.fileWrappers)
         #expect(newFile.manifest == manifestWithStrippedPins)
         #expect(newFile.images == ["foo.png": Data()])
+        #expect(!newFile.drawings.isEmpty)
     }
 
     @Test func preparesForExport() async throws {
@@ -83,6 +99,20 @@ struct CartographyMapFileTests {
         var file = try CartographyMapFile(decoding: map)
         file.images = ["foo.png": Data()]
         file.appState.tabCustomization = TabViewCustomization()
+        file.drawings = [
+            CartographyDrawing(
+                data: CartographyDrawing.DrawingOverlay(
+                    coordinate: CGPoint(x: 37, y: -122),
+                    drawing: PKDrawing(),
+                    mapRect: CartographyDrawing.DrawingOverlay.MapRect(
+                        x: 37,
+                        z: -122,
+                        width: 5,
+                        height: 5
+                    )
+                )
+            )
+        ]
     
         let wrapper = try file.wrapper()
 
@@ -111,10 +141,15 @@ struct CartographyMapFileTests {
         let library = wrapper.fileWrappers?["Library"]!
         #expect(library?.isDirectory == true)
         #expect(library?.fileWrappers?["Pins"] != nil)
+        #expect(library?.fileWrappers?["Drawings"] != nil)
 
-        let pins = library?.fileWrappers?["Pins"]!
-        #expect(pins?.isDirectory == true)
-        #expect(pins?.fileWrappers?.count == 2)
+        let pins = try #require(library?.fileWrappers?["Pins"])
+        #expect(pins.isDirectory == true)
+        #expect(pins.fileWrappers?.count == 2)
+
+        let drawings = try #require(library?.fileWrappers?["Drawings"])
+        #expect(drawings.isDirectory == true)
+        #expect(drawings.fileWrappers?.count == 1)
     }
 
     @Test func pinDeletesAtIndex() async throws {

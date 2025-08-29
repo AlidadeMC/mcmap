@@ -28,7 +28,7 @@ Alidade app possible.
 - <doc:Versions>
 - ``CartographyMapFile``
 - ``CartographyMapPin``
-
+- ``CartographyDrawing``
 
 ### Manifest Versions
 
