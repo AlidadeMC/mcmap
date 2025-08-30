@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import PencilKit
+@preconcurrency import PencilKit
 import VersionedCodable
 
 /// A representation of a player drawing that appears on a map.
@@ -62,7 +62,7 @@ public struct CartographyDrawing: SendableCoded, Identifiable {
     /// The drawing overlay contents to send to a corresponding map.
     public var data: DrawingOverlay
 
-    public init(id: UUID, data: DrawingOverlay) {
+    public init(id: UUID = UUID(), data: DrawingOverlay) {
         self.id = id
         self.data = data
     }
