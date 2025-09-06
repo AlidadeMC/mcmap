@@ -11,8 +11,7 @@ Review information about the various versions of the MCMap package format.
 This page is used to track each eversion of the MCMap package format and
 how it changes from each prior version.
 
-At the time of writing, the latest stable version of the format is **v1**.
-The latest in-progress version is **v2**.
+At the time of writing, the latest stable version of the format is **v2**.
 
 > Note: While this package supports reading all available versions of the
 > format, it will only write to the latest version. When reading a file
