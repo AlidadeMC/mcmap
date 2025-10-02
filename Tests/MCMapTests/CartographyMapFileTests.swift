@@ -147,6 +147,10 @@ struct CartographyMapFileTests {
         #expect(pins.isDirectory == true)
         #expect(pins.fileWrappers?.count == 2)
 
+        let names = try #require(pins.fileWrappers?.keys)
+        let expectedPinNames = file.pins.map { "\($0.name)_\($0.id.uuidString).json" }
+        #expect(Array(names) == expectedPinNames)
+
         let drawings = try #require(library?.fileWrappers?["Drawings"])
         #expect(drawings.isDirectory == true)
         #expect(drawings.fileWrappers?.count == 1)

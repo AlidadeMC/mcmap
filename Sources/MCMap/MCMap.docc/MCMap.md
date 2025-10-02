@@ -17,6 +17,10 @@ Alidade app possible.
 
 ## Topics
 
+### Getting Started
+
+- <doc:Changelog>
+
 ### File Format
 
 - <doc:About>

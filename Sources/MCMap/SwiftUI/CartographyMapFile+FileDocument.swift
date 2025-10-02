@@ -150,7 +150,9 @@ extension CartographyMapFile: FileDocument {
         var pinWrapperFiles = [String: FileWrapper]()
         if supportedFeatures.contains(.separateLibrary) {
             for pin in self.pins {
-                let filename = pin.name + ".json"
+                // NOTE(marquiskurt): Force the ID to also be visible with the pin's name, so that we avoid
+                // overrides. See: ALD-24.
+                let filename = "\(pin.name)_\(pin.id.uuidString).json"
                 let encoded = try Self.jsonEncoder().encode(versioned: pin)
                 pinWrapperFiles[filename] = FileWrapper(regularFileWithContents: encoded)
             }
